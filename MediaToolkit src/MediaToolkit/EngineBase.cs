@@ -1,4 +1,5 @@
-﻿namespace MediaToolkit
+﻿
+namespace MediaToolkit
 {
     using System;
     using System.Configuration;
@@ -77,6 +78,7 @@
 
         private void EnsureDirectoryExists()
         {
+            return;
             string directory = Path.GetDirectoryName(this.FFmpegFilePath) ?? Directory.GetCurrentDirectory(); ;
 
             if (!Directory.Exists(directory))
@@ -98,6 +100,7 @@
         /// <exception cref="Exception">    Thrown when an exception error condition occurs. </exception>
         private static void UnpackFFmpegExecutable(string path)
         {
+            return;
             Stream compressedFFmpegStream = Assembly.GetExecutingAssembly()
                                                     .GetManifestResourceStream(Resources.FFmpegManifestResourceName);
 

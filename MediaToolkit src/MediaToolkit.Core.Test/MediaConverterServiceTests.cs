@@ -33,9 +33,14 @@ namespace MediaToolkit.Core.Test
             });
 
             this.logger = factory.CreateLogger<IMediaConverterService>();
-            this.mediaConverter = new MediaConverterService(this.logger);
-            this.testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent?.Parent?.FullName + "/TestResults";
-            this.videoPath = this.testDir + "/BigBunny.m4v";
+            this.mediaConverter = new MediaConverterService(new FFmpegServiceConfiguration("/usr/bin/ffmpeg"),this.logger);
+            this.testDir = new DirectoryInfo(Directory.GetCurrentDirectory()) + "/TestResults";
+            Directory.CreateDirectory(testDir);
+            if(!File.Exists(testDir + "/BigBunny.m4v"))
+            {
+                File.Copy("BigBunny.m4v", testDir + "/BigBunny.m4v");
+            }
+            this.videoPath = testDir + "/BigBunny.m4v";
 
             if (outputToConsole)
             {

@@ -35,18 +35,16 @@ namespace MediaToolkit.Core.Utilities
 
         public void DecompressResourceStream(string resourceId, string toPath)
         {
-            Assembly currentAssembly = Assembly.GetExecutingAssembly();
+            //TODO: Make this cross-platform
+            return;
+            var currentAssembly = Assembly.GetExecutingAssembly();
 
-            using (Stream resourceStream = currentAssembly.GetManifestResourceStream(resourceId))
-            {
-                if (resourceStream == null) throw new Exception("GZip stream is null"); 
+            using var resourceStream = currentAssembly.GetManifestResourceStream(resourceId);
+            if (resourceStream == null) throw new Exception("GZip stream is null");
 
-                using (FileStream fileStream = new FileStream(toPath, FileMode.Create))
-                using (GZipStream compressedStream = new GZipStream(resourceStream, CompressionMode.Decompress))
-                {
-                    compressedStream.CopyTo(fileStream);
-                }
-            }
+            using var fileStream = new FileStream(toPath, FileMode.Create);
+            using var compressedStream = new GZipStream(resourceStream, CompressionMode.Decompress);
+            compressedStream.CopyTo(fileStream);
         }
     }
 

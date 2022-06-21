@@ -20,9 +20,9 @@ namespace MediaToolkit.Core.Test
         [OneTimeSetUp]
         public async Task Setup()
         {
-            this.metadataService = new MetadataService();
+            this.metadataService = new MetadataService(new FFprobeServiceConfiguration("/usr/bin/ffprobe"));
 
-            this.testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent?.Parent?.FullName + "/TestResults";
+            this.testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).FullName + "/TestResults";
             this.videoPath = this.testDir + "/BigBunny.m4v";
 
             this.metadataService.OnMetadataProcessedEventHandler += (sender, args) =>
@@ -33,14 +33,14 @@ namespace MediaToolkit.Core.Test
             if (File.Exists(this.videoPath)) { return; }
 
             Directory.CreateDirectory(this.testDir);
-            Assembly currentAssembly = Assembly.GetExecutingAssembly();
+            //Assembly currentAssembly = Assembly.GetExecutingAssembly();
 
-            using (Stream embeddedVideoStream = currentAssembly.GetManifestResourceStream(TestVideoResourceId))
+            /*using (Stream embeddedVideoStream = currentAssembly.GetManifestResourceStream(TestVideoResourceId))
             using (FileStream fileStream = new FileStream(this.videoPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
                 // ReSharper disable once PossibleNullReferenceException
                 await embeddedVideoStream.CopyToAsync(fileStream);
-            }
+            }*/
         }
 
         #region Metadata Tests
@@ -62,7 +62,7 @@ namespace MediaToolkit.Core.Test
             {
                 IInstructionBuilder custom = new GetMetadataInstructionBuilder()
                 {
-                    InputFilePath = file
+                    InputFilePath = file,
                 };
 
                 await this.metadataService.ExecuteInstructionAsync(custom);

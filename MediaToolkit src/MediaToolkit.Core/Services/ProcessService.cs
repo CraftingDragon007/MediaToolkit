@@ -24,7 +24,7 @@ namespace MediaToolkit.Core.Services
 
             if (!this.configuration.EmbeddedResourceId.IsNullOrWhiteSpace())
             {
-                this.utilities.DecompressResourceStream(this.configuration.EmbeddedResourceId, this.configuration.ExePath);
+               // this.utilities.DecompressResourceStream(this.configuration.EmbeddedResourceId, this.configuration.ExePath);
             }
         }                               
 
@@ -59,7 +59,7 @@ namespace MediaToolkit.Core.Services
         /// <returns>Path of temporary copy</returns>
         protected async Task<string> GetTempExe()
         {
-            string exeCopyPath = this.utilities.ChangeFilePathName(this.configuration.ExePath, Path.GetRandomFileName());
+            string exeCopyPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
             await this.utilities.CopyFileAsync(this.configuration.ExePath, exeCopyPath);
 
