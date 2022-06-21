@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace MediaToolkit.Options
 {
     public class ConversionOptions
@@ -42,12 +41,12 @@ namespace MediaToolkit.Options
         /// <summary>
         ///     The maximum duration
         /// </summary>
-        public TimeSpan? MaxVideoDuration = null;
+        public TimeSpan? MaxVideoDuration;
 
         /// <summary>
         ///     The frame to begin seeking from.
         /// </summary>
-        public TimeSpan? Seek = null;
+        public TimeSpan? Seek;
 
         /// <summary>
         ///     Predefined audio and video options for various file formats,
@@ -93,7 +92,7 @@ namespace MediaToolkit.Options
         /// <summary>
         ///     Specifies an optional rectangle from the source video to crop
         /// </summary>
-        public CropRectangle SourceCrop { get; set; }
+        public CropRectangle? SourceCrop { get; set; }
 
         /// <summary>
         ///     Specifies wheter or not to use H.264 Baseline Profile

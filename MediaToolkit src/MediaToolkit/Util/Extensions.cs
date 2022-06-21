@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 
 namespace System.Runtime.CompilerServices
 {
@@ -24,7 +21,7 @@ namespace MediaToolkit.Util
             while ((bytesRead = input.Read(buffer, 0, buffer.Length)) > 0) { output.Write(buffer, 0, bytesRead); }
         }
 
-        public static string FormatInvariant(this string value, params object[] args)
+        public static string? FormatInvariant(this string? value, params object[] args)
         {
             try
             {
@@ -32,12 +29,12 @@ namespace MediaToolkit.Util
                     ? string.Empty
                     : string.Format(CultureInfo.InvariantCulture, value, args);
             }
-            catch (FormatException ex) {
+            catch (FormatException) {
                 return value;
             }
         }
 
-        internal static bool IsNullOrWhiteSpace(this string value)
+        internal static bool IsNullOrWhiteSpace(this string? value)
         {
             return string.IsNullOrEmpty(value) || value.Trim()
                 .Length == 0;

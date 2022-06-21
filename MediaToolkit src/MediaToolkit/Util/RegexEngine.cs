@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using MediaToolkit.Model;
 using System.Globalization;
@@ -43,7 +41,7 @@ namespace MediaToolkit.Util
         ///     <para>If successful, outputs a <see cref="ConvertProgressEventArgs"/> which is </para>
         ///     <para>generated from the data. </para>
         /// </param>
-        internal static bool IsProgressData(string data, out ConvertProgressEventArgs progressEventArgs)
+        internal static bool IsProgressData(string data, out ConvertProgressEventArgs? progressEventArgs)
         {
             progressEventArgs = null;
 
@@ -115,7 +113,7 @@ namespace MediaToolkit.Util
         ///     <para>If successful, outputs a <see cref="ConversionCompleteEventArgs"/> which is </para>
         ///     <para>generated from the data. </para>
         /// </param>
-        internal static bool IsConvertCompleteData(string data, out ConversionCompleteEventArgs conversionCompleteEvent)
+        internal static bool IsConvertCompleteData(string data, out ConversionCompleteEventArgs? conversionCompleteEvent)
         {
             conversionCompleteEvent = null;
 
@@ -153,6 +151,8 @@ namespace MediaToolkit.Util
             GroupCollection matchVideoFps = Index[Find.VideoFps].Match(fullMetadata).Groups;
             Match matchVideoBitRate = Index[Find.BitRate].Match(fullMetadata);
 
+            Console.WriteLine(fullMetadata);
+            
             if (engine.InputFile.Metadata == null)
                 engine.InputFile.Metadata = new Metadata();
 
@@ -181,7 +181,7 @@ namespace MediaToolkit.Util
             GroupCollection matchAudioFormatHzChannel = Index[Find.AudioFormatHzChannel].Match(fullMetadata).Groups;
             GroupCollection matchAudioBitRate = Index[Find.BitRate].Match(fullMetadata).Groups;
 
-            if (engine.InputFile.Metadata == null)
+            if (engine.InputFile!.Metadata == null)
                 engine.InputFile.Metadata = new Metadata();
 
             if (engine.InputFile.Metadata.AudioData == null)

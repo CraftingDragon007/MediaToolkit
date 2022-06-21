@@ -1,7 +1,6 @@
 ﻿using MediaToolkit.Model;
 using MediaToolkit.Options;
 using MediaToolkit.Util;
-using System;
 using System.Globalization;
 using System.Text;
 
@@ -26,36 +25,36 @@ namespace MediaToolkit
             }
         }
 
-        private static string GetMetadata(MediaFile inputFile)
+        private static string GetMetadata(MediaFile? inputFile)
         {
-            return string.Format("-i \"{0}\" ", inputFile.Filename);
+            return $"-i \"{inputFile?.Filename}\" ";
         }
 
-        private static string GetThumbnail(MediaFile inputFile, MediaFile outputFile, ConversionOptions conversionOptions)
+        private static string GetThumbnail(MediaFile? inputFile, MediaFile? outputFile, ConversionOptions? conversionOptions)
         {
             var commandBuilder = new StringBuilder();
 
-            commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions.Seek.GetValueOrDefault(TimeSpan.FromSeconds(1)).TotalSeconds);
+            commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions!.Seek.GetValueOrDefault(TimeSpan.FromSeconds(1)).TotalSeconds);
 
-            commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile.Filename);
+            commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile!.Filename);
             commandBuilder.AppendFormat(" -vframes {0} ", 1);
 
-            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.Filename).ToString();
+            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile!.Filename).ToString();
         }
 
-        private static string Convert(MediaFile inputFile, MediaFile outputFile, ConversionOptions conversionOptions)
+        private static string Convert(MediaFile? inputFile, MediaFile? outputFile, ConversionOptions? conversionOptions)
         {
             var commandBuilder = new StringBuilder();
 
             // Default conversion
             if (conversionOptions == null)
-                return commandBuilder.AppendFormat(" -i \"{0}\"  \"{1}\" ", inputFile.Filename, outputFile.Filename).ToString();
+                return commandBuilder.AppendFormat(" -i \"{0}\"  \"{1}\" ", inputFile!.Filename, outputFile!.Filename).ToString();
 
             // Media seek position
             if (conversionOptions.Seek != null)
                 commandBuilder.AppendFormat(CultureInfo.InvariantCulture, " -ss {0} ", conversionOptions.Seek.Value.TotalSeconds);
 
-            commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile.Filename);
+            commandBuilder.AppendFormat(" -i \"{0}\" ", inputFile!.Filename);
 
             // Physical media conversion (DVD etc)
             if (conversionOptions.Target != Target.Default)
@@ -63,11 +62,11 @@ namespace MediaToolkit
                 commandBuilder.Append(" -target ");
                 if (conversionOptions.TargetStandard != TargetStandard.Default)
                 {
-                    commandBuilder.AppendFormat(" {0}-{1} \"{2}\" ", conversionOptions.TargetStandard.ToLower(), conversionOptions.Target.ToLower(), outputFile.Filename);
+                    commandBuilder.AppendFormat(" {0}-{1} \"{2}\" ", conversionOptions.TargetStandard.ToLower(), conversionOptions.Target.ToLower(), outputFile!.Filename);
 
                     return commandBuilder.ToString();
                 }
-                commandBuilder.AppendFormat("{0} \"{1}\" ", conversionOptions.Target.ToLower(), outputFile.Filename);
+                commandBuilder.AppendFormat("{0} \"{1}\" ", conversionOptions.Target.ToLower(), outputFile!.Filename);
 
                 return commandBuilder.ToString();
             }
@@ -128,7 +127,7 @@ namespace MediaToolkit
                 commandBuilder.Append(" -profile:v baseline ");
             }
 
-            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile.Filename).ToString();
+            return commandBuilder.AppendFormat(" \"{0}\" ", outputFile!.Filename).ToString();
         }
     }
 }

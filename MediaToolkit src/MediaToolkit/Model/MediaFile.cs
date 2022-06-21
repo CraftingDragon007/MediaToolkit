@@ -4,14 +4,14 @@
     {
         public MediaFile(){}
 
-        public MediaFile(string filename)
+        public MediaFile(string? filename)
         {
             Filename = filename;
         }
         
-        public string Filename { get; set; }
+        public string? Filename { get; set; }
 
-        public Metadata Metadata { get; internal set; }
+        public Metadata? Metadata { get; internal set; }
         
     }
 

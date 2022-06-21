@@ -11,7 +11,7 @@ namespace MediaToolkit.Test
     [TestFixture]
     public class ConvertTest
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void Init()
         {
             // Raise progress events?
@@ -33,10 +33,10 @@ namespace MediaToolkit.Test
             var directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
             Debug.Assert(directoryInfo.Parent != null, "directoryInfo.Parent != null");
 
-            DirectoryInfo testDirectoryInfo = directoryInfo.Parent.Parent;
+            DirectoryInfo testDirectoryInfo = directoryInfo.Parent.Parent.Parent;
             Debug.Assert(testDirectoryInfo != null, "testDirectoryInfo != null");
 
-            string testDirectoryPath = testDirectoryInfo.FullName + @"\TestVideo\";
+            string testDirectoryPath = testDirectoryInfo.FullName + @"/TestVideo/";
 
             Debug.Assert(Directory.Exists(testDirectoryPath), "Directory not found: " + testDirectoryPath);
             Debug.Assert(File.Exists(testDirectoryPath + @"BigBunny.m4v"),
@@ -61,7 +61,7 @@ namespace MediaToolkit.Test
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
@@ -89,7 +89,7 @@ namespace MediaToolkit.Test
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
@@ -120,10 +120,10 @@ namespace MediaToolkit.Test
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
-            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var localMediaToolkitFfMpeg = Path.Combine(localAppData, "MediaToolkit", "ffmpeg.exe");
+            /*var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var localMediaToolkitFfMpeg = Path.Combine(localAppData, "MediaToolkit", "ffmpeg.exe");*/
 
-            using (var engine = new Engine(localMediaToolkitFfMpeg))
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
@@ -147,7 +147,7 @@ namespace MediaToolkit.Test
             var inputFile = new MediaFile { Filename = _inputUrlPath };
             var outputFile = new MediaFile { Filename = outputPath };
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
@@ -167,7 +167,7 @@ namespace MediaToolkit.Test
         {
             var inputFile = new MediaFile { Filename = _inputFilePath };
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
                 engine.GetMetadata(inputFile);
 
             Metadata inputMeta = inputFile.Metadata;
@@ -198,7 +198,7 @@ namespace MediaToolkit.Test
             var outputFile = new MediaFile { Filename = outputPath };
 
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
@@ -224,7 +224,7 @@ namespace MediaToolkit.Test
             var outputFile = new MediaFile { Filename = outputPath };
 
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
@@ -252,7 +252,7 @@ namespace MediaToolkit.Test
 
             var conversionOptions = new ConversionOptions { Target = Target.DVD, TargetStandard = TargetStandard.PAL };
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
@@ -283,19 +283,19 @@ namespace MediaToolkit.Test
             };
 
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
                 engine.Convert(inputFile, outputFile, conversionOptions);
         }
 
         [TestCase]
         public void Can_ScaleDownPreservingAspectRatio()
         {
-            string outputPath = string.Format(@"{0}\Convert_Basic_Test.mp4", Path.GetDirectoryName(_outputFilePath));
+            string outputPath = $@"{Path.GetDirectoryName(_outputFilePath)}\Convert_Basic_Test.mp4";
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
 
-            using (var engine = new Engine())
+            using (var engine = new Engine("ffmpeg"))
             {
                 engine.ConvertProgressEvent += engine_ConvertProgressEvent;
                 engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
