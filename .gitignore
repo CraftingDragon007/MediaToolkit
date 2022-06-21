@@ -354,3 +354,6 @@ MigrationBackup/
 
 */MediaToolkit.Test/TestVideo/
 *.DotSettings
+
+# RiderConfigurationFolder
+.idea
