@@ -11,7 +11,7 @@ namespace MediaToolkit.Test
     [TestFixture]
     public class ConvertTest
     {
-        [SetUp]
+        [OneTimeSetUp]
         public void Init()
         {
             // Raise progress events?
@@ -33,10 +33,9 @@ namespace MediaToolkit.Test
             var directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
             Debug.Assert(directoryInfo.Parent != null, "directoryInfo.Parent != null");
 
-            DirectoryInfo testDirectoryInfo = directoryInfo;
-            Debug.Assert(testDirectoryInfo != null, "testDirectoryInfo != null");
+            Debug.Assert(directoryInfo != null, "testDirectoryInfo != null");
 
-            string testDirectoryPath = testDirectoryInfo.FullName + @"\TestVideo\";
+            var testDirectoryPath = directoryInfo.FullName + @"\TestVideo\";
             Directory.CreateDirectory(testDirectoryPath);
 
             if (!File.Exists(testDirectoryPath + "BigBunny.m4v"))
@@ -126,6 +125,8 @@ namespace MediaToolkit.Test
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
+            /*var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var localMediaToolkitFfMpeg = Path.Combine(localAppData, "MediaToolkit", "ffmpeg.exe");*/
 
             using (var engine = new Engine("ffmpeg"))
             {
@@ -294,7 +295,7 @@ namespace MediaToolkit.Test
         [TestCase]
         public void Can_ScaleDownPreservingAspectRatio()
         {
-            string outputPath = string.Format(@"{0}\Convert_Basic_Test.mp4", Path.GetDirectoryName(_outputFilePath));
+            string outputPath = $@"{Path.GetDirectoryName(_outputFilePath)}\Convert_Basic_Test.mp4";
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };

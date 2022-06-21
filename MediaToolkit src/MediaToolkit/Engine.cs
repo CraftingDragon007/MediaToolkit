@@ -1,15 +1,11 @@
-﻿namespace MediaToolkit
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Text.RegularExpressions;
-    using MediaToolkit.Core.Utilities;
-    using MediaToolkit.Model;
-    using MediaToolkit.Options;
-    using MediaToolkit.Properties;
-    using MediaToolkit.Util;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
+using MediaToolkit.Model;
+using MediaToolkit.Options;
+
+namespace MediaToolkit;
+
+using Util;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>   An engine. This class cannot be inherited. </summary>
@@ -18,14 +14,14 @@
         /// <summary>
         ///     Event queue for all listeners interested in conversionComplete events.
         /// </summary>
-        public event EventHandler<ConversionCompleteEventArgs> ConversionCompleteEvent;
+        public event EventHandler<ConversionCompleteEventArgs>? ConversionCompleteEvent;
 
         public Engine()
         {
             
         }
 
-        public Engine(string ffMpegPath) : base(ffMpegPath)
+        public Engine(string? ffMpegPath) : base(ffMpegPath)
         {
             
         }
@@ -71,7 +67,7 @@
         }
 
         /// <summary>   Event queue for all listeners interested in convertProgress events. </summary>
-        public event EventHandler<ConvertProgressEventArgs> ConvertProgressEvent;
+        public event EventHandler<ConvertProgressEventArgs>? ConvertProgressEvent;
 
         public void CustomCommand(string ffmpegCommand)
         {
@@ -123,7 +119,7 @@
 
         private void FFmpegEngine(EngineParameters engineParameters)
         {
-            if (!engineParameters.InputFile.Filename.StartsWith("http://") && !File.Exists(engineParameters.InputFile.Filename))
+            if (!engineParameters.InputFile!.Filename!.StartsWith("http://") && !File.Exists(engineParameters.InputFile.Filename))
             {
                 throw new FileNotFoundException(Resources.Exception_Media_Input_File_Not_Found, engineParameters.InputFile.Filename);
             }
@@ -141,12 +137,12 @@
 
         private ProcessStartInfo GenerateStartInfo(EngineParameters engineParameters)
         {
-            string arguments = CommandBuilder.Serialize(engineParameters);
+            var arguments = CommandBuilder.Serialize(engineParameters);
 
             return this.GenerateStartInfo(arguments);
         }
 
-        private ProcessStartInfo GenerateStartInfo(string arguments)
+        private ProcessStartInfo GenerateStartInfo(string? arguments)
         {
             //windows case
             if (Path.DirectorySeparatorChar == '\\')
@@ -184,24 +180,24 @@
         /// -------------------------------------------------------------------------------------------------
         /// <summary>   Raises the conversion complete event. </summary>
         /// <param name="e">    Event information to send to registered event handlers. </param>
-        private void OnConversionComplete(ConversionCompleteEventArgs e)
+        private void OnConversionComplete(ConversionCompleteEventArgs? e)
         {
-            EventHandler<ConversionCompleteEventArgs> handler = this.ConversionCompleteEvent;
+            EventHandler<ConversionCompleteEventArgs>? handler = this.ConversionCompleteEvent;
             if (handler != null)
             {
-                handler(this, e);
+                handler(this, e!);
             }
         }
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>   Raises the convert progress event. </summary>
         /// <param name="e">    Event information to send to registered event handlers. </param>
-        private void OnProgressChanged(ConvertProgressEventArgs e)
+        private void OnProgressChanged(ConvertProgressEventArgs? e)
         {
-            EventHandler<ConvertProgressEventArgs> handler = this.ConvertProgressEvent;
+            EventHandler<ConvertProgressEventArgs>? handler = this.ConvertProgressEvent;
             if (handler != null)
             {
-                handler(this, e);
+                handler(this, e!);
             }
         }
 
@@ -227,13 +223,13 @@
 
             using (this.FFmpegProcess = Process.Start(processStartInfo))
             {
-                Exception caughtException = null;
+                Exception? caughtException = null;
                 if (this.FFmpegProcess == null)
                 {
                     throw new InvalidOperationException(Resources.Exceptions_FFmpeg_Process_Not_Running);
                 }
 
-                this.FFmpegProcess.ErrorDataReceived += (sender, received) =>
+                this.FFmpegProcess.ErrorDataReceived += (_, received) =>
                 {
                     if (received.Data == null) return;
 #if (DebugToConsole)
@@ -260,21 +256,21 @@
                                 engineParameters.InputFile.Metadata.Duration = totalMediaDuration;
                             }
                         }
-                        ConversionCompleteEventArgs convertCompleteEvent;
-                        ConvertProgressEventArgs progressEvent;
+                        ConversionCompleteEventArgs? convertCompleteEvent;
+                        ConvertProgressEventArgs? progressEvent;
 
                         if (RegexEngine.IsProgressData(received.Data, out progressEvent))
                         {
-                            progressEvent.TotalDuration = totalMediaDuration;
+                            progressEvent!.TotalDuration = totalMediaDuration;
                             this.OnProgressChanged(progressEvent);
                         }
                         else if (RegexEngine.IsConvertCompleteData(received.Data, out convertCompleteEvent))
                         {
-                            convertCompleteEvent.TotalDuration = totalMediaDuration;
+                            convertCompleteEvent!.TotalDuration = totalMediaDuration;
                             this.OnConversionComplete(convertCompleteEvent);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception? ex)
                     {
                         // catch the exception and kill the process since we're in a faulted state
                         caughtException = ex;
@@ -297,10 +293,9 @@
                 if ((this.FFmpegProcess.ExitCode != 0 && this.FFmpegProcess.ExitCode != 1) || caughtException != null)
                 {
                     throw new Exception(
-                        this.FFmpegProcess.ExitCode + ": " + receivedMessagesLog[1] + receivedMessagesLog[0],
+                        this.FFmpegProcess.ExitCode + ": " + (receivedMessagesLog.Count >= 2 ? receivedMessagesLog[1] + receivedMessagesLog[0] : ""),
                         caughtException);
                 }
             }
         }
     }
-}

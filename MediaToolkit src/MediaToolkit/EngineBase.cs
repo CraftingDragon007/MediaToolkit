@@ -1,4 +1,3 @@
-﻿
 namespace MediaToolkit
 {
     using System;
@@ -8,27 +7,26 @@ namespace MediaToolkit
     using System.IO.Compression;
     using System.Reflection;
     using System.Threading;
-    using MediaToolkit.Core.Utilities;
-    using MediaToolkit.Properties;
-    using MediaToolkit.Util;
+
+    using Util;
 
     public class EngineBase : IDisposable
     {
-        private bool isDisposed;
+        private bool _isDisposed;
 
         /// <summary>   Used for locking the FFmpeg process to one thread. </summary>
         private const string LockName = "MediaToolkit.Engine.LockName";
 
-        private const string DefaultFFmpegFilePath = @"/MediaToolkit/ffmpeg.exe";
+        private const string DefaultFFmpegFilePath = @"MediaToolkit/ffmpeg.exe";
 
         /// <summary>   Full pathname of the FFmpeg file. </summary>
-        protected readonly string FFmpegFilePath;
+        protected readonly string? FFmpegFilePath;
 
         /// <summary>   The Mutex. </summary>
         protected readonly Mutex Mutex;
 
         /// <summary>   The ffmpeg process. </summary>
-        protected Process FFmpegProcess;
+        protected Process? FFmpegProcess;
 
 
          protected EngineBase()
@@ -41,10 +39,10 @@ namespace MediaToolkit
         ///     <para> Initializes FFmpeg.exe; Ensuring that there is a copy</para>
         ///     <para> in the clients temp folder &amp; isn't in use by another process.</para>
         /// </summary>
-        protected EngineBase(string ffMpegPath)
+        protected EngineBase(string? ffMpegPath)
         {
             this.Mutex = new Mutex(false, LockName);
-            this.isDisposed = false;
+            this._isDisposed = false;
 
             if (ffMpegPath.IsNullOrWhiteSpace())
             {
@@ -78,9 +76,10 @@ namespace MediaToolkit
 
         private void EnsureDirectoryExists()
         {
-            return;
-            string directory = Path.GetDirectoryName(this.FFmpegFilePath) ?? Directory.GetCurrentDirectory(); ;
+            var directory = Path.GetDirectoryName(this.FFmpegFilePath) ?? Directory.GetCurrentDirectory();
 
+            if(directory == "") return;
+            
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
@@ -98,11 +97,12 @@ namespace MediaToolkit
         ///-------------------------------------------------------------------------------------------------
         /// <summary>   Unpack ffmpeg executable. </summary>
         /// <exception cref="Exception">    Thrown when an exception error condition occurs. </exception>
-        private static void UnpackFFmpegExecutable(string path)
+        private static void UnpackFFmpegExecutable(string? path)
         {
+            //TODO: Make this cross-platform
             return;
-            Stream compressedFFmpegStream = Assembly.GetExecutingAssembly()
-                                                    .GetManifestResourceStream(Resources.FFmpegManifestResourceName);
+            var compressedFFmpegStream = Assembly.GetExecutingAssembly()
+                                                    .GetManifestResourceStream(Resources.FFmpegManifestResourceName!);
 
             if (compressedFFmpegStream == null)
             {
@@ -131,7 +131,7 @@ namespace MediaToolkit
 
         private void Dispose(bool disposing)
         {
-            if (!disposing || this.isDisposed)
+            if (!disposing || this._isDisposed)
             {
                 return;
             }
@@ -141,7 +141,7 @@ namespace MediaToolkit
                 this.FFmpegProcess.Dispose();
             }            
             this.FFmpegProcess = null;
-            this.isDisposed = true;
+            this._isDisposed = true;
         }
     }
 }

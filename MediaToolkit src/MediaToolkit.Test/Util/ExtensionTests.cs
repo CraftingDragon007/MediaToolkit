@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using MediaToolkit.Core.Utilities;
+using MediaToolkit.Util;
+using Moq;
 using NUnit.Framework;
 
 namespace MediaToolkit.Test.Util
