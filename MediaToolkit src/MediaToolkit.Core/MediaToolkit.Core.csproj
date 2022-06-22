@@ -12,8 +12,12 @@
         <Author>CraftingDragon007</Author>
         <RepositoryUrl>https://github.com/CraftingDragon007/MediaToolkit</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <Description>MediaToolkit is a .NET library for processing media files and streams.</Description>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Summary>MediaToolkit is a .NET library for processing media files and streams.</Summary>
+        <Title>CraftingDragon007.MediaToolkit</Title>
+        <PackageTags>media toolkit media processing ffmpeg</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
