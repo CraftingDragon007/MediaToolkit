@@ -106,7 +106,7 @@ namespace MediaToolkit
 
             if (compressedFFmpegStream == null)
             {
-                throw new Exception(Resources.Exceptions_Null_FFmpeg_Gzip_Stream);
+                throw new Exception(Resources.ExceptionsNullFFmpegGzipStream);
             }
 
             using (FileStream fileStream = new FileStream(path, FileMode.Create))

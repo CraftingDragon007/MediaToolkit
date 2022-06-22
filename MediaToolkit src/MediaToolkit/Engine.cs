@@ -121,7 +121,7 @@ using Util;
         {
             if (!engineParameters.InputFile!.Filename!.StartsWith("http://") && !File.Exists(engineParameters.InputFile.Filename))
             {
-                throw new FileNotFoundException(Resources.Exception_Media_Input_File_Not_Found, engineParameters.InputFile.Filename);
+                throw new FileNotFoundException(Resources.ExceptionMediaInputFileNotFound, engineParameters.InputFile.Filename);
             }
 
             try
@@ -226,7 +226,7 @@ using Util;
                 Exception? caughtException = null;
                 if (this.FFmpegProcess == null)
                 {
-                    throw new InvalidOperationException(Resources.Exceptions_FFmpeg_Process_Not_Running);
+                    throw new InvalidOperationException(Resources.ExceptionsFFmpegProcessNotRunning);
                 }
 
                 this.FFmpegProcess.ErrorDataReceived += (_, received) =>

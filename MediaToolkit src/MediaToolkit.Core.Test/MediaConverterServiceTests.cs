@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using System.Threading.Tasks;
 using MediaToolkit.Core.Infrastructure;
-using System.Threading;
 using MediaToolkit.Core.Services;
 
 namespace MediaToolkit.Core.Test
@@ -18,10 +12,10 @@ namespace MediaToolkit.Core.Test
     {
         private const string TestVideoResourceId = "MediaToolkit.Core.Test.Resources.BigBunny.m4v";
 
-        private ILogger<IMediaConverterService> logger;
-        private IMediaConverterService mediaConverter;
-        private string testDir;
-        private string videoPath;
+        private ILogger<IMediaConverterService>? _logger;
+        private IMediaConverterService? _mediaConverter;
+        private string? _testDir;
+        private string? _videoPath;
 
 
         public async Task Setup(bool outputToConsole)
@@ -32,46 +26,44 @@ namespace MediaToolkit.Core.Test
                 config.SetMinimumLevel(outputToConsole ? LogLevel.Trace : LogLevel.None);
             });
 
-            this.logger = factory.CreateLogger<IMediaConverterService>();
-            this.mediaConverter = new MediaConverterService(new FFmpegServiceConfiguration("/usr/bin/ffmpeg"),this.logger);
-            this.testDir = new DirectoryInfo(Directory.GetCurrentDirectory()) + "/TestResults";
-            Directory.CreateDirectory(testDir);
-            if(!File.Exists(testDir + "/BigBunny.m4v"))
+            this._logger = factory.CreateLogger<IMediaConverterService>();
+            this._mediaConverter = new MediaConverterService(new FFmpegServiceConfiguration(),this._logger);
+            this._testDir = new DirectoryInfo(Directory.GetCurrentDirectory()) + "/TestResults";
+            Directory.CreateDirectory(_testDir);
+            if(!File.Exists(_testDir + "/BigBunny.m4v"))
             {
-                File.Copy("BigBunny.m4v", testDir + "/BigBunny.m4v");
+                File.Copy("BigBunny.m4v", _testDir + "/BigBunny.m4v");
             }
-            this.videoPath = testDir + "/BigBunny.m4v";
+            this._videoPath = _testDir + "/BigBunny.m4v";
 
             if (outputToConsole)
             {
-                this.mediaConverter.OnWarningEventHandler += (sender, args) =>
+                this._mediaConverter.OnWarningEventHandler += (_, args) =>
                 {
                     Console.WriteLine($"### Warning > {args.Warning}");
                 };
 
-                this.mediaConverter.OnProgressUpdateEventHandler += (sender, args) =>
+                this._mediaConverter.OnProgressUpdateEventHandler += (_, args) =>
                 {
-                    int max = args.UpdateData.Max(x => x.Key.Length) + 1;
-                    IEnumerable<string> updateData = args.UpdateData.Select(x => $"{x.Key.PadRight(max)}={x.Value}");
-                    string updateDataString = string.Join("\n", updateData);
+                    var max = args.UpdateData.Max(x => x.Key.Length) + 1;
+                    var updateData = args.UpdateData.Select(x => $"{x.Key.PadRight(max)}={x.Value}");
+                    var updateDataString = string.Join("\n", updateData);
                     Console.WriteLine("### Progress Update\n" + updateDataString + "\n");
                 };
 
-                this.mediaConverter.OnCompleteEventHandler += (sender, args) => { Console.WriteLine("### Complete"); };
+                this._mediaConverter.OnCompleteEventHandler += (_, _) => { Console.WriteLine("### Complete"); };
 
             }
 
-            if (File.Exists(this.videoPath)) { return; }
+            if (File.Exists(this._videoPath)) { return; }
 
-            Directory.CreateDirectory(this.testDir);
-            Assembly currentAssembly = Assembly.GetExecutingAssembly();
+            Directory.CreateDirectory(this._testDir);
+            var currentAssembly = Assembly.GetExecutingAssembly();
 
-            using (Stream embeddedVideoStream = currentAssembly.GetManifestResourceStream(TestVideoResourceId))
-            using (FileStream fileStream = new FileStream(this.videoPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
-            {
-                // ReSharper disable once PossibleNullReferenceException
-                await embeddedVideoStream.CopyToAsync(fileStream);
-            }
+            await using var embeddedVideoStream = currentAssembly.GetManifestResourceStream(TestVideoResourceId);
+            await using var fileStream = new FileStream(this._videoPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+            // ReSharper disable once PossibleNullReferenceException
+            await embeddedVideoStream?.CopyToAsync(fileStream)!;
         }
 
         [OneTimeSetUp()]
@@ -88,10 +80,10 @@ namespace MediaToolkit.Core.Test
           
             IInstructionBuilder custom = new CustomInstructionBuilder
             {
-                Instruction = $@" -i ""{this.videoPath}"" ""{Path.ChangeExtension(this.videoPath, ".mp4")}"""
+                Instruction = $@" -i ""{this._videoPath}"" ""{Path.ChangeExtension(this._videoPath, ".mp4")}"""
             };
 
-            await this.mediaConverter.ExecuteInstructionAsync(custom);
+            await this._mediaConverter?.ExecuteInstructionAsync(custom)!;
         }
 
         [Test]
@@ -99,13 +91,13 @@ namespace MediaToolkit.Core.Test
         {
             IInstructionBuilder builder = new TrimMediaInstructionBuilder
             {
-                InputFilePath = this.videoPath,
-                OutputFilePath = Path.ChangeExtension(this.videoPath, "Trim_Video_Test.mp4"),
+                InputFilePath = this._videoPath,
+                OutputFilePath = Path.ChangeExtension(this._videoPath, "Trim_Video_Test.mp4"),
                 SeekFrom = TimeSpan.FromSeconds(5),
                 Duration = TimeSpan.FromSeconds(25)
             };
 
-            await this.mediaConverter.ExecuteInstructionAsync(builder);
+            await this._mediaConverter!.ExecuteInstructionAsync(builder);
 
             // Output video will be only a few seconds, not 25 seconds long because 
             // total video length is 33 or so seconds. The current duration set is longer
@@ -119,15 +111,15 @@ namespace MediaToolkit.Core.Test
         {
             IInstructionBuilder builder = new CropVideoInstructionBuilder
             {
-                InputFilePath = this.videoPath,
-                OutputFilePath = Path.ChangeExtension(this.videoPath, "Crop_Video_Test.mp4"),
+                InputFilePath = this._videoPath,
+                OutputFilePath = Path.ChangeExtension(this._videoPath, "Crop_Video_Test.mp4"),
                 X = 100,
                 Y = 100,
                 Width = 50,
                 Height = 50
             };
 
-            await this.mediaConverter.ExecuteInstructionAsync(builder);
+            await this._mediaConverter!.ExecuteInstructionAsync(builder);
         }
 
         [Test]
@@ -135,12 +127,12 @@ namespace MediaToolkit.Core.Test
         {
             IInstructionBuilder builder = new ExtractThumbnailInstructionBuilder
             {
-                InputFilePath = this.videoPath,
-                OutputFilePath = Path.ChangeExtension(this.videoPath, "Get_Thumbnail_Test.jpg"),
+                InputFilePath = this._videoPath,
+                OutputFilePath = Path.ChangeExtension(this._videoPath, "Get_Thumbnail_Test.jpg")!,
                 SeekFrom = TimeSpan.FromSeconds(10)
             };
 
-            await this.mediaConverter.ExecuteInstructionAsync(builder);
+            await this._mediaConverter!.ExecuteInstructionAsync(builder);
         }
 
         [Test]
@@ -149,11 +141,11 @@ namespace MediaToolkit.Core.Test
             IInstructionBuilder builder = new ExtractThumbnailInstructionBuilder
             {
                 InputFilePath = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",
-                OutputFilePath = Path.ChangeExtension(this.videoPath, "Get_Thumbnail_Online_Test.jpg"),
+                OutputFilePath = Path.ChangeExtension(this._videoPath, "Get_Thumbnail_Online_Test.jpg")!,
                 SeekFrom = TimeSpan.FromSeconds(10)
             };
 
-            await this.mediaConverter.ExecuteInstructionAsync(builder);
+            await this._mediaConverter!.ExecuteInstructionAsync(builder);
         }
 
         [Test]
@@ -161,11 +153,11 @@ namespace MediaToolkit.Core.Test
         {
             IInstructionBuilder builder = new BasicInstructionBuilder
             {
-                InputFilePath = this.videoPath,
-                OutputFilePath = Path.ChangeExtension(this.videoPath, "Basic_Conversion_Test.mp4")
+                InputFilePath = this._videoPath!,
+                OutputFilePath = Path.ChangeExtension(this._videoPath, "Basic_Conversion_Test.mp4")!
             };
 
-            await this.mediaConverter.ExecuteInstructionAsync(builder);
+            await this._mediaConverter!.ExecuteInstructionAsync(builder);
         }
 
         [Test]
@@ -173,11 +165,11 @@ namespace MediaToolkit.Core.Test
         {
             IInstructionBuilder builder = new BasicInstructionBuilder
             {
-                InputFilePath = this.videoPath,
-                OutputFilePath = Path.ChangeExtension(this.videoPath, "Get_Gif_Test.gif"),
+                InputFilePath = this._videoPath!,
+                OutputFilePath = Path.ChangeExtension(this._videoPath, "Get_Gif_Test.gif")!,
             };
 
-            await this.mediaConverter.ExecuteInstructionAsync(builder);
+            await this._mediaConverter!.ExecuteInstructionAsync(builder);
         }
 
         /// <summary>
@@ -219,20 +211,20 @@ namespace MediaToolkit.Core.Test
 
                 IInstructionBuilder builder = new BasicInstructionBuilder
                 {
-                    InputFilePath = this.videoPath,
-                    OutputFilePath = Path.ChangeExtension(this.videoPath, "Basic_Conversion_Test" + icopy + ".mp4")
+                    InputFilePath = this._videoPath!,
+                    OutputFilePath = Path.ChangeExtension(this._videoPath, "Basic_Conversion_Test" + icopy + ".mp4")!
                 };
 
                 async Task LimiterWrapper()
                 {
                     if (!useLimiter)
                     {
-                        await this.mediaConverter.ExecuteInstructionAsync(builder);
+                        await this._mediaConverter!.ExecuteInstructionAsync(builder);
                         return;
                     }
 
                     limiter.WaitOne();
-                    await this.mediaConverter.ExecuteInstructionAsync(builder);
+                    await this._mediaConverter!.ExecuteInstructionAsync(builder);
                     limiter.Release();
                 }
 
@@ -243,7 +235,7 @@ namespace MediaToolkit.Core.Test
 
             for (int i = 0; i < totalTasks; i++)
             {
-                File.Delete(Path.ChangeExtension(this.videoPath, "Basic_Conversion_Test" + i + ".mp4") ?? throw new InvalidOperationException());
+                File.Delete(Path.ChangeExtension(this._videoPath, "Basic_Conversion_Test" + i + ".mp4") ?? throw new InvalidOperationException());
             }
 
             limiter.Dispose();

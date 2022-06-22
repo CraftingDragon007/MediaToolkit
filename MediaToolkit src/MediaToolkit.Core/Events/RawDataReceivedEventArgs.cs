@@ -1,14 +1,11 @@
-﻿using System;
+﻿namespace MediaToolkit.Core.Events;
 
-namespace MediaToolkit.Core.Events
+public class RawDataReceivedEventArgs : EventArgs
 {
-    public class RawDataReceivedEventArgs : EventArgs
+    public RawDataReceivedEventArgs(string data)
     {
-        public RawDataReceivedEventArgs(string data)
-        {
-            this.Data = data;
-        }
-
-        public string Data { get; }
+        Data = data;
     }
+
+    public string Data { get; }
 }

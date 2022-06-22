@@ -1,15 +1,13 @@
-﻿using System;
-using MediaToolkit.Core.Meta;
+﻿using MediaToolkit.Core.Meta;
 
-namespace MediaToolkit.Core.Events
+namespace MediaToolkit.Core.Events;
+
+public class MetadataEventArgs : EventArgs
 {
-    public class MetadataEventArgs : EventArgs
+    public MetadataEventArgs(Metadata metadata)
     {
-        public MetadataEventArgs(Metadata metadata)
-        {
-            this.Metadata = metadata;
-        }
-
-        public Metadata Metadata { get; }
+        Metadata = metadata;
     }
+
+    public Metadata Metadata { get; }
 }

@@ -1,10 +1,8 @@
 ﻿using MediaToolkit.Model;
 using MediaToolkit.Options;
 using NUnit.Framework;
-using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 
 namespace MediaToolkit.Test
 {
@@ -23,6 +21,7 @@ namespace MediaToolkit.Test
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (inputFile != "")
             {
+                // ReSharper disable once HeuristicUnreachableCode
                 _inputFilePath = inputFile;
                 if (outputFile != "")
                     _outputFilePath = outputFile;
@@ -60,16 +59,16 @@ namespace MediaToolkit.Test
         [TestCase]
         public void Can_CutVideo()
         {
-            string filePath = @"{0}\Cut_Video_Test.mp4";
-            string outputPath = string.Format(filePath, Path.GetDirectoryName(_outputFilePath));
+            const string filePath = @"{0}\Cut_Video_Test.mp4";
+            var outputPath = string.Format(filePath, Path.GetDirectoryName(_outputFilePath));
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
 
             using (var engine = new Engine("ffmpeg"))
             {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
 
                 engine.GetMetadata(inputFile);
 
@@ -96,8 +95,8 @@ namespace MediaToolkit.Test
 
             using (var engine = new Engine("ffmpeg"))
             {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
 
                 engine.GetMetadata(inputFile);
 
@@ -130,14 +129,14 @@ namespace MediaToolkit.Test
 
             using (var engine = new Engine("ffmpeg"))
             {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
 
                 engine.GetMetadata(inputFile);
 
                 var options = new ConversionOptions
                 {
-                    Seek = TimeSpan.FromSeconds(inputFile.Metadata.Duration.TotalSeconds / 2)
+                    Seek = TimeSpan.FromSeconds(inputFile.Metadata!.Duration.TotalSeconds / 2)
                 };
                 engine.GetThumbnail(inputFile, outputFile, options);
             }
@@ -147,24 +146,22 @@ namespace MediaToolkit.Test
         [TestCase]
         public void Can_GetThumbnailFromHTTPLink()
         {
-            string outputPath = string.Format(@"{0}\Get_Thumbnail_FromHTTP_Test.jpg", Path.GetDirectoryName(_outputFilePath));
+            var outputPath = string.Format(@"{0}\Get_Thumbnail_FromHTTP_Test.jpg", Path.GetDirectoryName(_outputFilePath));
 
             var inputFile = new MediaFile { Filename = _inputUrlPath };
             var outputFile = new MediaFile { Filename = outputPath };
 
-            using (var engine = new Engine("ffmpeg"))
+            using var engine = new Engine("ffmpeg");
+            engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+            engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
+
+            engine.GetMetadata(inputFile);
+
+            var options = new ConversionOptions
             {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
-
-                engine.GetMetadata(inputFile);
-
-                var options = new ConversionOptions
-                {
-                    Seek = TimeSpan.FromSeconds(inputFile.Metadata.Duration.TotalSeconds / 2)
-                };
-                engine.GetThumbnail(inputFile, outputFile, options);
-            }
+                Seek = TimeSpan.FromSeconds(inputFile.Metadata!.Duration.TotalSeconds / 2)
+            };
+            engine.GetThumbnail(inputFile, outputFile, options);
         }
 
         [TestCase]
@@ -175,16 +172,16 @@ namespace MediaToolkit.Test
             using (var engine = new Engine("ffmpeg"))
                 engine.GetMetadata(inputFile);
 
-            Metadata inputMeta = inputFile.Metadata;
+            var inputMeta = inputFile.Metadata;
 
-            Debug.Assert(inputMeta.Duration != TimeSpan.Zero, "Media duration is zero", "  Likely due to Regex code");
-            Debug.Assert(inputMeta.VideoData.Format != null, "Video format not found", "  Likely due to Regex code");
+            Debug.Assert(inputMeta!.Duration != TimeSpan.Zero, "Media duration is zero", "  Likely due to Regex code");
+            Debug.Assert(inputMeta.VideoData!.Format != null, "Video format not found", "  Likely due to Regex code");
             Debug.Assert(inputMeta.VideoData.ColorModel != null, "Color model not found", "   Likely due to Regex code");
             Debug.Assert(inputMeta.VideoData.FrameSize != null, "Frame size not found", "    Likely due to Regex code");
             Debug.Assert(inputMeta.VideoData.Fps.ToString(CultureInfo.InvariantCulture) != "0", "Fps not found",
                 "           Likely due to Regex code");
             Debug.Assert(inputMeta.VideoData.BitRateKbs != 0, "Video bitrate not found", " Likely due to Regex code");
-            Debug.Assert(inputMeta.AudioData.Format != null, "Audio format not found", "  Likely due to Regex code");
+            Debug.Assert(inputMeta.AudioData!.Format != null, "Audio format not found", "  Likely due to Regex code");
             Debug.Assert(inputMeta.AudioData.SampleRate != null, "Sample rate not found", "   Likely due to Regex code");
             Debug.Assert(inputMeta.AudioData.ChannelOutput != null, "Channel output not found",
                 "Likely due to Regex code");
@@ -197,7 +194,7 @@ namespace MediaToolkit.Test
         [TestCase]
         public void Can_ConvertBasic()
         {
-            string outputPath = string.Format(@"{0}\Convert_Basic_Test.avi", Path.GetDirectoryName(_outputFilePath));
+            var outputPath = $@"{Path.GetDirectoryName(_outputFilePath)}\Convert_Basic_Test.avi";
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
@@ -205,16 +202,16 @@ namespace MediaToolkit.Test
 
             using (var engine = new Engine("ffmpeg"))
             {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
 
                 engine.Convert(inputFile, outputFile);
                 engine.GetMetadata(inputFile);
                 engine.GetMetadata(outputFile);
             }
 
-            Metadata inputMeta = inputFile.Metadata;
-            Metadata outputMeta = outputFile.Metadata;
+            var inputMeta = inputFile.Metadata!;
+            var outputMeta = outputFile.Metadata!;
 
             PrintMetadata(inputMeta);
             PrintMetadata(outputMeta);
@@ -223,7 +220,7 @@ namespace MediaToolkit.Test
         [TestCase]
         public void Can_ConvertToGif()
         {
-            string outputPath = string.Format(@"{0}\Convert_GIF_Test.gif", Path.GetDirectoryName(_outputFilePath));
+            var outputPath = $@"{Path.GetDirectoryName(_outputFilePath)}\Convert_GIF_Test.gif";
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
@@ -231,16 +228,16 @@ namespace MediaToolkit.Test
 
             using (var engine = new Engine("ffmpeg"))
             {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
 
                 engine.Convert(inputFile, outputFile);
                 engine.GetMetadata(inputFile);
                 engine.GetMetadata(outputFile);
             }
 
-            Metadata inputMeta = inputFile.Metadata;
-            Metadata outputMeta = outputFile.Metadata;
+            var inputMeta = inputFile.Metadata!;
+            var outputMeta = outputFile.Metadata!;
 
             PrintMetadata(inputMeta);
             PrintMetadata(outputMeta);
@@ -250,7 +247,7 @@ namespace MediaToolkit.Test
         [TestCase]
         public void Can_ConvertToDVD()
         {
-            string outputPath = string.Format("{0}/Convert_DVD_Test.vob", Path.GetDirectoryName(_outputFilePath));
+            var outputPath = $"{Path.GetDirectoryName(_outputFilePath)}/Convert_DVD_Test.vob";
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
@@ -259,8 +256,8 @@ namespace MediaToolkit.Test
 
             using (var engine = new Engine("ffmpeg"))
             {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
 
                 engine.Convert(inputFile, outputFile, conversionOptions);
 
@@ -268,14 +265,14 @@ namespace MediaToolkit.Test
                 engine.GetMetadata(outputFile);
             }
 
-            PrintMetadata(inputFile.Metadata);
-            PrintMetadata(outputFile.Metadata);
+            PrintMetadata(inputFile.Metadata!);
+            PrintMetadata(outputFile.Metadata!);
         }
 
         [TestCase]
         public void Can_TranscodeUsingConversionOptions()
         {
-            string outputPath = string.Format("{0}/Transcode_Test.avi", Path.GetDirectoryName(_outputFilePath));
+            var outputPath = $"{Path.GetDirectoryName(_outputFilePath)}/Transcode_Test.avi";
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
@@ -288,27 +285,25 @@ namespace MediaToolkit.Test
             };
 
 
-            using (var engine = new Engine("ffmpeg"))
-                engine.Convert(inputFile, outputFile, conversionOptions);
+            using var engine = new Engine("ffmpeg");
+            engine.Convert(inputFile, outputFile, conversionOptions);
         }
 
         [TestCase]
         public void Can_ScaleDownPreservingAspectRatio()
         {
-            string outputPath = $@"{Path.GetDirectoryName(_outputFilePath)}\Convert_Basic_Test.mp4";
+            var outputPath = $@"{Path.GetDirectoryName(_outputFilePath)}\Convert_Basic_Test.mp4";
 
             var inputFile = new MediaFile { Filename = _inputFilePath };
             var outputFile = new MediaFile { Filename = outputPath };
 
-            using (var engine = new Engine("ffmpeg"))
-            {
-                engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+            using var engine = new Engine("ffmpeg");
+            engine.ConvertProgressEvent += engine_ConvertProgressEvent!;
+            engine.ConversionCompleteEvent += engine_ConversionCompleteEvent!;
 
-                engine.Convert(inputFile, outputFile, new ConversionOptions { VideoSize = VideoSize.Custom, CustomHeight = 120 });
-                engine.GetMetadata(inputFile);
-                engine.GetMetadata(outputFile);
-            }
+            engine.Convert(inputFile, outputFile, new ConversionOptions { VideoSize = VideoSize.Custom, CustomHeight = 120 });
+            engine.GetMetadata(inputFile);
+            engine.GetMetadata(outputFile);
 
             // Returns, because the parsing is not up to date with the new ffmpeg.
             return;

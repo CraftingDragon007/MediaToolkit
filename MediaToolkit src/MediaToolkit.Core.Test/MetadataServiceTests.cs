@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-using MediaToolkit.Core.Infrastructure;
+﻿using MediaToolkit.Core.Infrastructure;
 using MediaToolkit.Core.Services;
 using NUnit.Framework;
 
@@ -11,28 +7,30 @@ namespace MediaToolkit.Core.Test
     [TestFixture]
     public class MetadataServiceTests
     {
-        private const string TestVideoResourceId = "MediaToolkit.Core.Test.Resources.BigBunny.m4v";
-
-        private MetadataService metadataService;
-        private string testDir;
-        private string videoPath;
+        private MetadataService? _metadataService;
+        private string? _testDir;
+        private string? _videoPath;
 
         [OneTimeSetUp]
-        public async Task Setup()
+        public Task Setup()
         {
-            this.metadataService = new MetadataService(new FFprobeServiceConfiguration("/usr/bin/ffprobe"));
+            this._metadataService = new MetadataService(new FFprobeServiceConfiguration());
 
-            this.testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).FullName + "/TestResults";
-            this.videoPath = this.testDir + "/BigBunny.m4v";
+            this._testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).FullName + "/TestResults";
+            this._videoPath = this._testDir + "/BigBunny.m4v";
 
-            this.metadataService.OnMetadataProcessedEventHandler += (sender, args) =>
+            this._metadataService.OnMetadataProcessedEventHandler += (_, args) =>
             {
                 Console.WriteLine(args.Metadata.RawMetaData);
             };
 
-            if (File.Exists(this.videoPath)) { return; }
+            if (File.Exists(this._videoPath))
+            {
+                return Task.CompletedTask;
+            }
 
-            Directory.CreateDirectory(this.testDir);
+            Directory.CreateDirectory(this._testDir);
+            return Task.CompletedTask;
             //Assembly currentAssembly = Assembly.GetExecutingAssembly();
 
             /*using (Stream embeddedVideoStream = currentAssembly.GetManifestResourceStream(TestVideoResourceId))
@@ -58,14 +56,14 @@ namespace MediaToolkit.Core.Test
             //await tests.ExctractThumbnail_InstructionBuilder_Test();
             //await tests.TrimMedia_InstructionBuilder_Test();
 
-            foreach (string file in Directory.GetFiles(this.testDir))
+            foreach (var file in Directory.GetFiles(this._testDir!))
             {
                 IInstructionBuilder custom = new GetMetadataInstructionBuilder()
                 {
                     InputFilePath = file,
                 };
 
-                await this.metadataService.ExecuteInstructionAsync(custom);
+                await this._metadataService!.ExecuteInstructionAsync(custom);
             }
             
         }

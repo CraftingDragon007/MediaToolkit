@@ -1,12 +1,9 @@
-﻿using System;
+﻿namespace MediaToolkit.Core.Utilities;
 
-namespace MediaToolkit.Core.Utilities
+public static class StringExtensions
 {
-    public static class StringExtensions
+    public static bool IsNullOrWhiteSpace(this string text)
     {
-        public static bool IsNullOrWhiteSpace(this string text)
-        {
-            return String.IsNullOrWhiteSpace(text);
-        }
+        return string.IsNullOrWhiteSpace(text);
     }
 }

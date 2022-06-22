@@ -1,5 +1,9 @@
-﻿namespace MediaToolkit.Options
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace MediaToolkit.Options
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum Target
     {
         Default,

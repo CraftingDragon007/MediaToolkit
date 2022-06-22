@@ -1,9 +1,8 @@
-﻿namespace MediaToolkit.Core.Services
+﻿namespace MediaToolkit.Core.Services;
+
+public interface IProcessServiceConfiguration
 {
-    public interface IProcessServiceConfiguration
-    {
-        string ExePath { get; set; }
-        string GlobalArguments { get; set; }
-        string EmbeddedResourceId { get; set; }
-    }
+    string ExePath { get; set; }
+    string GlobalArguments { get; set; }
+    string EmbeddedResourceId { get; set; }
 }

@@ -1,7 +1,6 @@
-﻿namespace MediaToolkit.Core.Infrastructure
+﻿namespace MediaToolkit.Core.Infrastructure;
+
+public interface IInstructionBuilder
 {
-    public interface IInstructionBuilder
-    {
-        string BuildInstructions();
-    }
+    string BuildInstructions();
 }
