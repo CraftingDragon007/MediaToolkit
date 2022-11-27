@@ -19,11 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Resources\BigBunny.m4v" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="Resources\BigBunny.m4v" />
+      <EmbeddedResource Include="Resources\BigBunny.m4v">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
