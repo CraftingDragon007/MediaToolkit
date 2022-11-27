@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net7.0;netstandard2.1</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>CraftingDragon007.MediaToolkit</PackageId>
@@ -18,6 +18,8 @@
         <Summary>MediaToolkit is a .NET library for processing media files and streams.</Summary>
         <Title>CraftingDragon007.MediaToolkit</Title>
         <PackageTags>media toolkit media processing ffmpeg</PackageTags>
+        <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+        <ImplicitUsings>disable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>

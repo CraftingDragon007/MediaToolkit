@@ -1,11 +1,16 @@
-﻿namespace MediaToolkit.Core.Events;
+﻿using System;
+using System.Collections.Generic;
 
-public class ProgressUpdateEventArgs : EventArgs
+namespace MediaToolkit.Core.Events
 {
-    public ProgressUpdateEventArgs(Dictionary<string, string> updateData)
-    {
-        UpdateData = updateData;
-    }
 
-    public Dictionary<string, string> UpdateData { get; }
+    public class ProgressUpdateEventArgs : EventArgs
+    {
+        public ProgressUpdateEventArgs(Dictionary<string, string> updateData)
+        {
+            UpdateData = updateData;
+        }
+
+        public Dictionary<string, string> UpdateData { get; }
+    }
 }

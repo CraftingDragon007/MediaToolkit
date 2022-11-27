@@ -1,4 +1,6 @@
 
+using System;
+
 namespace MediaToolkit
 {
     public class ConvertProgressEventArgs : EventArgs

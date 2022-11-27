@@ -1,11 +1,15 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using MediaToolkit.Model;
 using MediaToolkit.Options;
 
-namespace MediaToolkit;
+namespace MediaToolkit
+{
 
-using Util;
+    using Util;
 
     /// -------------------------------------------------------------------------------------------------
     /// <summary>   An engine. This class cannot be inherited. </summary>
@@ -18,12 +22,12 @@ using Util;
 
         public Engine()
         {
-            
+
         }
 
         public Engine(string? ffMpegPath) : base(ffMpegPath)
         {
-            
+
         }
 
         /// -------------------------------------------------------------------------------------------------
@@ -37,12 +41,12 @@ using Util;
         public void Convert(MediaFile inputFile, MediaFile outputFile, ConversionOptions options)
         {
             EngineParameters engineParams = new EngineParameters
-                {
-                    InputFile = inputFile,
-                    OutputFile = outputFile,
-                    ConversionOptions = options,
-                    Task = FFmpegTask.Convert
-                };
+            {
+                InputFile = inputFile,
+                OutputFile = outputFile,
+                ConversionOptions = options,
+                Task = FFmpegTask.Convert
+            };
 
             this.FFmpegEngine(engineParams);
         }
@@ -57,11 +61,11 @@ using Util;
         public void Convert(MediaFile inputFile, MediaFile outputFile)
         {
             EngineParameters engineParams = new EngineParameters
-                {
-                    InputFile = inputFile,
-                    OutputFile = outputFile,
-                    Task = FFmpegTask.Convert
-                };
+            {
+                InputFile = inputFile,
+                OutputFile = outputFile,
+                Task = FFmpegTask.Convert
+            };
 
             this.FFmpegEngine(engineParams);
         }
@@ -76,7 +80,7 @@ using Util;
                 throw new ArgumentNullException("ffmpegCommand");
             }
 
-            EngineParameters engineParameters = new EngineParameters { CustomArguments = ffmpegCommand };
+            EngineParameters engineParameters = new EngineParameters {CustomArguments = ffmpegCommand};
 
             this.StartFFmpegProcess(engineParameters);
         }
@@ -89,10 +93,10 @@ using Util;
         public void GetMetadata(MediaFile inputFile)
         {
             EngineParameters engineParams = new EngineParameters
-                {
-                    InputFile = inputFile,
-                    Task = FFmpegTask.GetMetaData
-                };
+            {
+                InputFile = inputFile,
+                Task = FFmpegTask.GetMetaData
+            };
 
             this.FFmpegEngine(engineParams);
         }
@@ -105,23 +109,25 @@ using Util;
         public void GetThumbnail(MediaFile inputFile, MediaFile outputFile, ConversionOptions options)
         {
             EngineParameters engineParams = new EngineParameters
-                {
-                    InputFile = inputFile,
-                    OutputFile = outputFile,
-                    ConversionOptions = options,
-                    Task = FFmpegTask.GetThumbnail
-                };
+            {
+                InputFile = inputFile,
+                OutputFile = outputFile,
+                ConversionOptions = options,
+                Task = FFmpegTask.GetThumbnail
+            };
 
             this.FFmpegEngine(engineParams);
         }
-        
+
         #region Private method - Helpers
 
         private void FFmpegEngine(EngineParameters engineParameters)
         {
-            if (!engineParameters.InputFile!.Filename!.StartsWith("http://") && !File.Exists(engineParameters.InputFile.Filename))
+            if (!engineParameters.InputFile!.Filename!.StartsWith("http://") &&
+                !File.Exists(engineParameters.InputFile.Filename))
             {
-                throw new FileNotFoundException(Resources.ExceptionMediaInputFileNotFound, engineParameters.InputFile.Filename);
+                throw new FileNotFoundException(Resources.ExceptionMediaInputFileNotFound,
+                    engineParameters.InputFile.Filename);
             }
 
             try
@@ -174,7 +180,7 @@ using Util;
                 };
             }
         }
-        
+
         #endregion
 
         /// -------------------------------------------------------------------------------------------------
@@ -216,10 +222,10 @@ using Util;
         {
             List<string> receivedMessagesLog = new List<string>();
             TimeSpan totalMediaDuration = new TimeSpan();
-         
-            ProcessStartInfo processStartInfo = engineParameters.HasCustomArguments 
-                                              ? this.GenerateStartInfo(engineParameters.CustomArguments)
-                                              : this.GenerateStartInfo(engineParameters);
+
+            ProcessStartInfo processStartInfo = engineParameters.HasCustomArguments
+                ? this.GenerateStartInfo(engineParameters.CustomArguments)
+                : this.GenerateStartInfo(engineParameters);
 
             using (this.FFmpegProcess = Process.Start(processStartInfo))
             {
@@ -237,13 +243,13 @@ using Util;
 #endif
                     try
                     {
-                        
+
                         receivedMessagesLog.Insert(0, received.Data);
                         if (engineParameters.InputFile != null)
                         {
                             RegexEngine.TestVideo(received.Data, engineParameters);
                             RegexEngine.TestAudio(received.Data, engineParameters);
-                        
+
                             Match matchDuration = RegexEngine.Index[RegexEngine.Find.Duration].Match(received.Data);
                             if (matchDuration.Success)
                             {
@@ -256,6 +262,7 @@ using Util;
                                 engineParameters.InputFile.Metadata.Duration = totalMediaDuration;
                             }
                         }
+
                         ConversionCompleteEventArgs? convertCompleteEvent;
                         ConvertProgressEventArgs? progressEvent;
 
@@ -293,9 +300,12 @@ using Util;
                 if ((this.FFmpegProcess.ExitCode != 0 && this.FFmpegProcess.ExitCode != 1) || caughtException != null)
                 {
                     throw new Exception(
-                        this.FFmpegProcess.ExitCode + ": " + (receivedMessagesLog.Count >= 2 ? receivedMessagesLog[1] + receivedMessagesLog[0] : ""),
+                        this.FFmpegProcess.ExitCode + ": " + (receivedMessagesLog.Count >= 2
+                            ? receivedMessagesLog[1] + receivedMessagesLog[0]
+                            : ""),
                         caughtException);
                 }
             }
         }
     }
+}

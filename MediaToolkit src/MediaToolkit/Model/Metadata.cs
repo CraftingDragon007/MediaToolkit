@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace MediaToolkit.Model
 {
     public class Metadata

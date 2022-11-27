@@ -1,16 +1,18 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace MediaToolkit.Core.Infrastructure;
-
-public class GetMetadataInstructionBuilder : IInstructionBuilder
+namespace MediaToolkit.Core.Infrastructure
 {
-    public string? InputFilePath { get; set; }
 
-    public string BuildInstructions()
+    public class GetMetadataInstructionBuilder : IInstructionBuilder
     {
-        var builder = new StringBuilder();
-        builder.AppendFormat(CultureInfo.InvariantCulture, " \"{0}\" ", InputFilePath);
-        return builder.ToString();
+        public string? InputFilePath { get; set; }
+
+        public string BuildInstructions()
+        {
+            var builder = new StringBuilder();
+            builder.AppendFormat(CultureInfo.InvariantCulture, " \"{0}\" ", InputFilePath);
+            return builder.ToString();
+        }
     }
 }

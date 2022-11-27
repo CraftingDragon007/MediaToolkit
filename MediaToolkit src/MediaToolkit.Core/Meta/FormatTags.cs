@@ -1,16 +1,18 @@
 ﻿using Newtonsoft.Json;
 
-namespace MediaToolkit.Core.Meta;
-
-public class FormatTags
+namespace MediaToolkit.Core.Meta
 {
-    [JsonProperty("major_brand")] public string? MajorBrand { get; set; }
 
-    [JsonProperty("minor_version")] public string? MinorVersion { get; set; }
+    public class FormatTags
+    {
+        [JsonProperty("major_brand")] public string? MajorBrand { get; set; }
 
-    [JsonProperty("compatible_brands")] public string? CompatibleBrands { get; set; }
+        [JsonProperty("minor_version")] public string? MinorVersion { get; set; }
 
-    [JsonProperty("encoder")] public string? Encoder { get; set; }
+        [JsonProperty("compatible_brands")] public string? CompatibleBrands { get; set; }
 
-    [JsonProperty("creation_time")] public string? CreationTime { get; set; }
+        [JsonProperty("encoder")] public string? Encoder { get; set; }
+
+        [JsonProperty("creation_time")] public string? CreationTime { get; set; }
+    }
 }

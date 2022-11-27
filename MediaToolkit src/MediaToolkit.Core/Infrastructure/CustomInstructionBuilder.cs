@@ -1,11 +1,13 @@
-﻿namespace MediaToolkit.Core.Infrastructure;
-
-public class CustomInstructionBuilder : IInstructionBuilder
+﻿namespace MediaToolkit.Core.Infrastructure
 {
-    public string Instruction { get; set; } = null!;
 
-    public string BuildInstructions()
+    public class CustomInstructionBuilder : IInstructionBuilder
     {
-        return Instruction;
+        public string Instruction { get; set; } = null!;
+
+        public string BuildInstructions()
+        {
+            return Instruction;
+        }
     }
 }

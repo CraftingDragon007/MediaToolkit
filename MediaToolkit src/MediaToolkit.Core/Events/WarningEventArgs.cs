@@ -1,11 +1,15 @@
-﻿namespace MediaToolkit.Core.Events;
+﻿using System;
 
-public class WarningEventArgs : EventArgs
+namespace MediaToolkit.Core.Events
 {
-    public WarningEventArgs(string warning)
-    {
-        Warning = warning;
-    }
 
-    public string Warning { get; }
+    public class WarningEventArgs : EventArgs
+    {
+        public WarningEventArgs(string warning)
+        {
+            Warning = warning;
+        }
+
+        public string Warning { get; }
+    }
 }

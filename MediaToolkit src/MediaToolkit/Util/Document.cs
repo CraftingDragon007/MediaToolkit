@@ -1,4 +1,6 @@
 ﻿
+using System.IO;
+
 namespace MediaToolkit.Util
 {
     using System;

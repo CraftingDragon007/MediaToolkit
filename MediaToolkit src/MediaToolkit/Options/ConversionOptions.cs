@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace MediaToolkit.Options
 {
     public class ConversionOptions

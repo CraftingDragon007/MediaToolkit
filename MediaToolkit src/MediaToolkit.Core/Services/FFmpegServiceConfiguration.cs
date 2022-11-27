@@ -1,34 +1,40 @@
-﻿namespace MediaToolkit.Core.Services;
+﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 
-public class FFmpegServiceConfiguration : IProcessServiceConfiguration
+namespace MediaToolkit.Core.Services
 {
-    public FFmpegServiceConfiguration(string? exePath = null,
-        string? globalArguments = null,
-        string? embeddedResourceId = null)
+
+    public class FFmpegServiceConfiguration : IProcessServiceConfiguration
     {
-        var path = Environment.GetEnvironmentVariable("PATH");
-        var pathItems = path?.Split(OperatingSystem.IsWindows() ? ';' : ':');
-        if (pathItems != null && exePath == null)
-            foreach (var pathItem in pathItems)
-                if (OperatingSystem.IsWindows())
-                {
-                    if (!File.Exists(pathItem + "\\ffmpeg.exe")) continue;
-                    ExePath = pathItem + "\\ffmpeg.exe";
-                    break;
-                }
-                else if (OperatingSystem.IsLinux())
-                {
-                    if (!File.Exists(pathItem + "/ffmpeg")) continue;
-                    ExePath = pathItem + "/ffmpeg";
-                    break;
-                }
+        public FFmpegServiceConfiguration(string? exePath = null,
+            string? globalArguments = null,
+            string? embeddedResourceId = null)
+        {
+            var path = Environment.GetEnvironmentVariable("PATH");
+            var pathItems = path?.Split(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ';' : ':');
+            if (pathItems != null && exePath == null)
+                foreach (var pathItem in pathItems)
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        if (!File.Exists(pathItem + "\\ffmpeg.exe")) continue;
+                        ExePath = pathItem + "\\ffmpeg.exe";
+                        break;
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    {
+                        if (!File.Exists(pathItem + "/ffmpeg")) continue;
+                        ExePath = pathItem + "/ffmpeg";
+                        break;
+                    }
 
-        ExePath ??= exePath ?? Directory.GetCurrentDirectory() + @"/MediaToolkit/ffmpeg.exe";
-        GlobalArguments = globalArguments ?? @"-nostdin -progress pipe:2 -y -loglevel warning ";
-        EmbeddedResourceId = embeddedResourceId ?? "MediaToolkit.Core.Resources.FFmpeg.exe.gz";
+            ExePath ??= exePath ?? Directory.GetCurrentDirectory() + @"/MediaToolkit/ffmpeg.exe";
+            GlobalArguments = globalArguments ?? @"-nostdin -progress pipe:2 -y -loglevel warning ";
+            EmbeddedResourceId = embeddedResourceId ?? "MediaToolkit.Core.Resources.FFmpeg.exe.gz";
+        }
+
+        public string ExePath { get; set; }
+        public string GlobalArguments { get; set; }
+        public string EmbeddedResourceId { get; set; }
     }
-
-    public string ExePath { get; set; }
-    public string GlobalArguments { get; set; }
-    public string EmbeddedResourceId { get; set; }
 }
